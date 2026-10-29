@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#101116">
+    <title>Crear cuenta · WTWT</title>
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/auth-layout.css">
+    <link rel="stylesheet" href="../css/auth-form.css">
+</head>
+<body>
+    <header class="site-header">
+        <a href="../../Index.html" class="brand" aria-label="WTWT, volver al inicio">WTWT</a>
+    </header>
+
+    <main class="login-main">
+        <section class="login-card" aria-labelledby="register-title">
+            <div class="login-heading">
+                <p class="eyebrow">Únete a la comunidad</p>
+                <h1 id="register-title" class="login-title">Crea tu cuenta</h1>
+                <p class="login-subtitle">Empieza a guardar, calificar y descubrir tus próximos favoritos.</p>
+            </div>
+
+            <form class="login-form" action="#" method="post">
+                <div class="field">
+                    <label class="label" for="name">Nombre</label>
+                    <input class="input" type="text" id="name" name="name" placeholder="Tu nombre" autocomplete="name" required>
+                </div>
+
+                <div class="field">
+                    <label class="label" for="email">Correo electrónico</label>
+                    <input class="input" type="email" id="email" name="email" placeholder="nombre@correo.com" autocomplete="email" required>
+                </div>
+
+                <div class="field">
+                    <label class="label" for="password">Contraseña</label>
+                    <input class="input" type="password" id="password" name="password" placeholder="Al menos 8 caracteres" autocomplete="new-password" minlength="8" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Crear cuenta</button>
+
+                <p class="login-footer">
+                    ¿Ya tienes una cuenta? <a href="../../Index.html" class="link-strong">Inicia sesión</a>
+                </p>
+            </form>
+        </section>
+    </main>
+</body>
+</html>
