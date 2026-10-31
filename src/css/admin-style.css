@@ -39,6 +39,11 @@
     border-color: var(--accent);
 }
 
+.nav-tab:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
 .admin-hero {
     display: flex;
     align-items: center;
@@ -124,7 +129,7 @@
     flex-wrap: wrap;
 }
 
-.status-Segment {
+.status-segment {
     display: inline-flex;
     gap: 6px;
     flex-wrap: wrap;
@@ -206,6 +211,7 @@
     color: var(--text);
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -325,6 +331,7 @@
     color: var(--text-muted);
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
