@@ -102,6 +102,35 @@ function updateStatsUI() {
   els.statTotalCategories.textContent = String(state.categories.length);
 }
 
+function isPlaceholderUrl(url) {
+  if (!url || typeof url !== 'string') return true;
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname === 'example.com' || parsed.hostname.endsWith('.example.com');
+  } catch {
+    return true;
+  }
+}
+
+function applyAdminPoster(imgEl, title) {
+  const seed = encodeURIComponent(`wtwt-poster-${title?.id || title?.title || 'default'}`);
+  const fallbackUrl = `https://picsum.photos/seed/${seed}/450/675`;
+  const primaryUrl = !isPlaceholderUrl(title?.posterUrl) ? title.posterUrl : fallbackUrl;
+  imgEl.alt = title?.title || 'Póster';
+  imgEl.onerror = () => {
+    if (imgEl.src !== fallbackUrl) {
+      imgEl.src = fallbackUrl;
+    }
+  };
+  imgEl.src = primaryUrl;
+}
+
+function resolveAdminBannerUrl(title) {
+  const seed = encodeURIComponent(`wtwt-banner-${title?.id || title?.title || 'default'}`);
+  const fallbackUrl = `https://picsum.photos/seed/${seed}/1280/520`;
+  return !isPlaceholderUrl(title?.bannerUrl) ? title.bannerUrl : fallbackUrl;
+}
+
 function createDetailRow(label, value) {
   const item = document.createElement('div');
   item.className = 'pending-detail-item';
@@ -132,18 +161,9 @@ function renderPendingQueue() {
 
     const thumb = document.createElement('div');
     thumb.className = 'pending-thumb';
-    if (title.posterUrl) {
-      const img = document.createElement('img');
-      img.src = title.posterUrl;
-      img.alt = title.title;
-      img.addEventListener('error', () => {
-        img.remove();
-        thumb.textContent = 'Sin póster';
-      });
-      thumb.append(img);
-    } else {
-      thumb.textContent = 'Sin póster';
-    }
+    const thumbImg = document.createElement('img');
+    applyAdminPoster(thumbImg, title);
+    thumb.append(thumbImg);
 
     const info = document.createElement('div');
     info.className = 'pending-info';
@@ -277,18 +297,9 @@ function renderTitlesTable() {
       const tdPoster = document.createElement('td');
       const posterBox = document.createElement('div');
       posterBox.className = 'table-poster';
-      if (item.posterUrl) {
-        const img = document.createElement('img');
-        img.src = item.posterUrl;
-        img.alt = item.title;
-        img.addEventListener('error', () => {
-          img.remove();
-          posterBox.textContent = 'N/A';
-        });
-        posterBox.append(img);
-      } else {
-        posterBox.textContent = 'N/A';
-      }
+      const posterImg = document.createElement('img');
+      applyAdminPoster(posterImg, item);
+      posterBox.append(posterImg);
       tdPoster.append(posterBox);
 
       const tdMain = document.createElement('td');
@@ -599,12 +610,11 @@ function openDetailModal(title) {
 
   els.detailModalBody.replaceChildren();
 
-  if (title.bannerUrl) {
-    const banner = document.createElement('div');
-    banner.className = 'detail-banner-preview';
-    banner.style.backgroundImage = `url('${title.bannerUrl.replace(/'/g, "\\'")}')`;
-    els.detailModalBody.append(banner);
-  }
+  const banner = document.createElement('div');
+  banner.className = 'detail-banner-preview';
+  const bannerUrl = resolveAdminBannerUrl(title);
+  banner.style.backgroundImage = `url('${bannerUrl.replace(/'/g, "\\'")}')`;
+  els.detailModalBody.append(banner);
 
   const desc = document.createElement('p');
   desc.className = 'synopsis';
