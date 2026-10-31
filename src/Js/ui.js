@@ -39,3 +39,16 @@ export function setBusy(form, busy) {
   button.textContent = busy ? 'Espera…' : button.dataset.label;
 }
 
+let toastTimer = null;
+
+export function showToast(message, isError = false) {
+  const toast = document.querySelector('#global-toast');
+  if (!toast) return;
+  toast.textContent = message;
+  toast.classList.toggle('is-error', isError);
+  toast.hidden = false;
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toast.hidden = true;
+  }, 5000);
+}
