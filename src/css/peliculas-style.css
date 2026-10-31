@@ -12,9 +12,6 @@
     --accent: #e5484d;
     --accent-hover: #c93b40;
     --star-active: #f59e0b;
-    --success: #10b981;
-    --warning: #f59e0b;
-    --danger: #ef4444;
     --radius: 8px;
     color-scheme: dark;
 }
@@ -756,6 +753,7 @@ a {
     color: var(--text-muted);
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -1084,11 +1082,6 @@ a {
 
 .btn-logout:hover {
     background: rgba(255, 255, 255, 0.12);
-}
-
-.status-main,
-.admin-content {
-    padding: 36px clamp(16px, 4vw, 32px);
 }
 
 .status-message {
