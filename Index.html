@@ -18,7 +18,9 @@
                  <p class="login-subtitle">Guarda tus títulos, califica películas y crea listas.</p>
             </div>
 
-            <form class="login-form" action="./src/html/peliculas.html" method="get">
+            <form id="login-form" class="login-form" action="./src/html/peliculas.html" method="post" novalidate>
+                <p class="form-alert" role="alert" hidden></p>
+
                 <div class="field">
                     <label class="label" for="email">Correo electrónico</label>
                     <input class="input" type="email" id="email" name="email" placeholder="@email.com" autocomplete="email" required>
@@ -37,16 +39,16 @@
                     Mantener sesión iniciada
                 </label>
 
-                <button type="submit" class="btn btn-primary">Entrar</button>
+                <button type="submit" class="btn btn-primary" data-label="Entrar">Entrar</button>
 
                 <div class="divider">o</div>
 
-
                 <p class="login-footer">
-                    ¿No tienes cuenta? <a href="#" class="link-strong">Regístrate</a>
+                    ¿No tienes cuenta? <a href="./src/html/registro.html" class="link-strong">Regístrate</a>
                 </p>
             </form>
         </section>
     </main>
+    <script type="module" src="./src/Js/login.js"></script>
 </body>
 </html>
