@@ -1,5 +1,6 @@
 import { api, ApiError } from './api.js';
 import { saveToken } from './session.js';
+import { ROLES } from './roles.js';
 import { showFormError, setBusy } from './ui.js';
 
 const form = document.querySelector('#login-form');
@@ -18,7 +19,8 @@ form.addEventListener('submit', async (event) => {
       },
     });
     saveToken(json.data.token, data.get('remember') === 'on');
-    location.href = './src/html/peliculas.html';
+    const role = json.data?.user?.role;
+    location.href = role === ROLES.ADMIN ? './src/html/admin.html' : './src/html/peliculas.html';
   } catch (err) {
     showFormError(form, err instanceof ApiError ? err : new ApiError(err.message));
     form.querySelector('#password').value = '';
@@ -26,4 +28,3 @@ form.addEventListener('submit', async (event) => {
     setBusy(form, false);
   }
 });
-
