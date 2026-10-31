@@ -13,9 +13,9 @@
             <nav class="main-nav" aria-label="Navegación principal">
                 <a href="#catalogo-section" class="nav-link">Catálogo</a>
                 <a href="#detalle-section" class="nav-link">Ficha técnica</a>
+                <a href="#resenas-section" class="nav-link">Comentarios</a>
                 <a href="#categorias-section" class="nav-link">Categorías</a>
                 <a href="#mis-propuestas-section" id="nav-proposals" class="nav-link" hidden>Mis propuestas</a>
-                <a href="#resenas-section" class="nav-link">Reseñas</a>
             </nav>
         </div>
 
@@ -43,7 +43,9 @@
 
     <main class="movie-main">
         <section id="detalle-section" class="hero" aria-labelledby="movie-title">
-            <div class="hero-backdrop" id="hero-backdrop"></div>
+            <div class="hero-banner-wrap">
+                <img id="movie-banner-img" class="hero-banner-img" alt="">
+            </div>
             <div class="hero-content">
                 <div class="hero-badges">
                     <span id="movie-category-badge" class="hero-eyebrow">CATÁLOGO · WTWT</span>
@@ -68,9 +70,28 @@
 
         <section class="details-section" aria-label="Información completa del título">
             <aside class="details-sidebar">
-                <div id="poster-container" class="poster-box" role="img" aria-label="Póster del título">
-                    <img id="movie-poster-img" class="poster-img" alt="" hidden>
-                    <span id="movie-poster-fallback">[SIN PÓSTER]</span>
+                <div id="poster-container" class="poster-box" role="img" aria-label="Póster de la película">
+                    <img id="movie-poster-img" class="poster-img" alt="">
+                </div>
+
+                <div class="rating-card">
+                    <div class="rating-card-header">
+                        <p class="rating-label">Calificación por estrellas</p>
+                        <span id="sidebar-rating-avg" class="rating-avg-badge">★ Sin votos</span>
+                    </div>
+                    <div id="sidebar-star-rating" class="star-rating" role="radiogroup" aria-label="Tu calificación en estrellas">
+                        <input type="radio" id="star5" name="sidebar-rating" value="5">
+                        <label for="star5" title="5 estrellas">★</label>
+                        <input type="radio" id="star4" name="sidebar-rating" value="4">
+                        <label for="star4" title="4 estrellas">★</label>
+                        <input type="radio" id="star3" name="sidebar-rating" value="3">
+                        <label for="star3" title="3 estrellas">★</label>
+                        <input type="radio" id="star2" name="sidebar-rating" value="2">
+                        <label for="star2" title="2 estrellas">★</label>
+                        <input type="radio" id="star1" name="sidebar-rating" value="1">
+                        <label for="star1" title="1 estrella">★</label>
+                    </div>
+                    <p id="sidebar-rating-hint" class="rating-hint">Haz clic en las estrellas para calificar esta película.</p>
                 </div>
 
                 <div class="quick-stats-card">
@@ -109,7 +130,7 @@
                 <ul id="movie-tags" class="genre-tags" aria-label="Etiquetas del título"></ul>
 
                 <section class="specs-section" aria-labelledby="specs-title">
-                    <h2 id="specs-title" class="cast-heading">Ficha técnica completa (Datos del Backend)</h2>
+                    <h2 id="specs-title" class="cast-heading">Ficha técnica completa</h2>
 
                     <div class="specs-grid">
                         <article class="spec-card">
@@ -172,6 +193,61 @@
                             <span id="spec-trailer-empty" class="spec-empty">No registrado</span>
                         </article>
                     </div>
+                </section>
+
+                <section id="resenas-section" class="movie-comments-section" aria-labelledby="reviews-heading">
+                    <div class="comments-header">
+                        <div>
+                            <h2 id="reviews-heading" class="cast-heading">Reseñas por comentarios</h2>
+                            <p id="reviews-subtitle" class="section-subtitle">Calificación por estrellas y comentarios exclusivos para esta película.</p>
+                        </div>
+                        <span id="comments-count-badge" class="genre-pill">0 comentarios</span>
+                    </div>
+
+                    <form id="review-form" class="comment-composer" novalidate>
+                        <p class="form-alert" role="alert" hidden></p>
+                        <input type="hidden" id="review-id" name="reviewId">
+
+                        <div class="composer-top-row">
+                            <span class="composer-rating-label">Tu calificación:</span>
+                            <div id="comment-star-rating" class="star-rating star-rating-inline" role="radiogroup" aria-label="Calificación en estrellas del comentario">
+                                <input type="radio" id="c-star5" name="rating" value="5" checked>
+                                <label for="c-star5" title="5 estrellas">★</label>
+                                <input type="radio" id="c-star4" name="rating" value="4">
+                                <label for="c-star4" title="4 estrellas">★</label>
+                                <input type="radio" id="c-star3" name="rating" value="3">
+                                <label for="c-star3" title="3 estrellas">★</label>
+                                <input type="radio" id="c-star2" name="rating" value="2">
+                                <label for="c-star2" title="2 estrellas">★</label>
+                                <input type="radio" id="c-star1" name="rating" value="1">
+                                <label for="c-star1" title="1 estrella">★</label>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label class="sr-only" for="review-comment">Escribe tu comentario</label>
+                            <textarea
+                                class="input textarea comment-textarea"
+                                id="review-comment"
+                                name="comment"
+                                rows="3"
+                                placeholder="Escribe un comentario sobre esta película…"
+                                required
+                            ></textarea>
+                        </div>
+
+                        <div class="composer-actions">
+                            <button type="submit" class="btn-action btn-trailer btn-compact" data-label="Publicar comentario">
+                                Publicar comentario
+                            </button>
+                            <button type="button" id="btn-cancel-review" class="btn-action btn-watchlist btn-compact" hidden>
+                                Cancelar edición
+                            </button>
+                        </div>
+                    </form>
+
+                    <div id="user-reviews-list" class="comments-feed"></div>
+                    <p id="user-reviews-empty" class="status-message">Sé el primero en dejar un comentario para esta película.</p>
                 </section>
             </div>
         </section>
@@ -246,55 +322,6 @@
                 </div>
             </div>
             <div id="categories-showcase" class="categories-showcase"></div>
-        </section>
-
-        <section id="resenas-section" class="catalog-section" aria-labelledby="reviews-heading">
-            <div class="catalog-header">
-                <div>
-                    <h2 id="reviews-heading" class="section-heading">Calificaciones y reseñas del título seleccionado</h2>
-                    <p id="reviews-subtitle" class="section-subtitle">Califica del 1 al 10 y comparte tu reseña sobre el título actual.</p>
-                </div>
-            </div>
-
-            <div class="reviews-layout">
-                <form id="review-form" class="panel-form" novalidate>
-                    <h3 id="review-form-title" class="panel-form-heading">Publicar reseña</h3>
-                    <p class="form-alert" role="alert" hidden></p>
-
-                    <input type="hidden" id="review-id" name="reviewId">
-
-                    <div class="field">
-                        <label class="label" for="review-movie-id">ID del título a calificar</label>
-                        <input class="input" type="number" id="review-movie-id" name="movieId" min="1" required readonly>
-                    </div>
-
-                    <div class="field">
-                        <label class="label" for="review-rating">Calificación (1 a 10 ★)</label>
-                        <input class="input" type="number" id="review-rating" name="rating" min="1" max="10" value="8" required>
-                    </div>
-
-                    <div class="field">
-                        <label class="label" for="review-title">Título de la reseña (opcional, máx. 100)</label>
-                        <input class="input" type="text" id="review-title" name="title" maxlength="100" placeholder="Ej. Una obra maestra visual">
-                    </div>
-
-                    <div class="field">
-                        <label class="label" for="review-comment">Comentario (opcional)</label>
-                        <textarea class="input textarea" id="review-comment" name="comment" rows="4" placeholder="Escribe tu opinión sobre este título…"></textarea>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="submit" class="btn-action btn-trailer" data-label="Guardar reseña">Guardar reseña</button>
-                        <button type="button" id="btn-cancel-review" class="btn-action btn-watchlist" hidden>Cancelar edición</button>
-                    </div>
-                </form>
-
-                <div class="reviews-list-panel">
-                    <h3 class="panel-form-heading">Mis reseñas enviadas</h3>
-                    <div id="user-reviews-list" class="reviews-list"></div>
-                    <p id="user-reviews-empty" class="status-message">No has registrado reseñas para este título todavía.</p>
-                </div>
-            </div>
         </section>
     </main>
 

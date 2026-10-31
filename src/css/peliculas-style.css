@@ -206,7 +206,7 @@ a {
 
 .hero {
     position: relative;
-    min-height: 360px;
+    min-height: 380px;
     display: flex;
     align-items: flex-end;
     padding: 44px clamp(16px, 4vw, 32px);
@@ -215,20 +215,32 @@ a {
     overflow: hidden;
 }
 
-.hero-backdrop {
+.hero-banner-wrap {
     position: absolute;
     inset: 0;
-    background-size: cover;
-    background-position: center;
-    opacity: 0.28;
-    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
 }
 
-.hero-backdrop::after {
+.hero-banner-wrap::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, rgba(14, 15, 18, 0.96) 15%, rgba(14, 15, 18, 0.72) 60%, rgba(14, 15, 18, 0.45) 100%);
+    background: linear-gradient(
+        90deg,
+        rgba(14, 15, 18, 0.92) 8%,
+        rgba(14, 15, 18, 0.68) 48%,
+        rgba(14, 15, 18, 0.32) 100%
+    );
+}
+
+.hero-banner-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    opacity: 0.65;
 }
 
 .hero-content {
@@ -282,6 +294,7 @@ a {
     font-size: clamp(28px, 4.5vw, 44px);
     font-weight: 800;
     line-height: 1.15;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.65);
 }
 
 .hero-meta {
@@ -351,12 +364,12 @@ a {
 .btn-watchlist {
     font-weight: 600;
     color: var(--text);
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.08);
     border: 1px solid var(--border-strong);
 }
 
 .btn-watchlist:hover {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.14);
 }
 
 .btn-danger {
@@ -383,7 +396,7 @@ a {
 
 .details-section {
     display: grid;
-    grid-template-columns: 300px 1fr;
+    grid-template-columns: 290px 1fr;
     gap: 32px;
     padding: 32px clamp(16px, 4vw, 32px);
     border-bottom: 1px solid var(--border);
@@ -396,25 +409,99 @@ a {
 }
 
 .poster-box {
-    min-height: 390px;
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    max-height: 410px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    color: var(--text-faint);
-    font-size: 12px;
-    letter-spacing: 0.04em;
     overflow: hidden;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.38);
 }
 
 .poster-img {
     width: 100%;
     height: 100%;
-    max-height: 430px;
     object-fit: cover;
     display: block;
+}
+
+.rating-card {
+    padding: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.rating-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.rating-label {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.rating-avg-badge {
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--star-active);
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    border-radius: 999px;
+}
+
+.star-rating {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.star-rating input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.star-rating label {
+    font-size: 24px;
+    line-height: 1;
+    color: var(--border-strong);
+    cursor: pointer;
+    transition: color 0.15s ease, transform 0.1s ease;
+}
+
+.star-rating label:hover {
+    transform: scale(1.12);
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label {
+    color: var(--star-active);
+}
+
+.star-rating-inline label {
+    font-size: 20px;
+}
+
+.rating-hint {
+    margin: 0;
+    font-size: 12px;
+    color: var(--text-muted);
 }
 
 .quick-stats-card {
@@ -521,6 +608,10 @@ a {
     font-weight: 700;
 }
 
+.specs-section {
+    margin-bottom: 28px;
+}
+
 .specs-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
@@ -572,6 +663,142 @@ a {
 .spec-empty {
     font-size: 13px;
     color: var(--text-faint);
+}
+
+.movie-comments-section {
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.comments-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.comment-composer {
+    padding: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.composer-top-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.composer-rating-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.comment-textarea {
+    min-height: 76px;
+}
+
+.composer-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.comments-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.comment-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.comment-avatar {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: rgba(229, 72, 77, 0.18);
+    border: 1px solid rgba(229, 72, 77, 0.4);
+    color: #fecaca;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+}
+
+.comment-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.comment-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.comment-author-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.comment-author {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.comment-stars {
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: var(--star-active);
+}
+
+.comment-date {
+    font-size: 11px;
+    color: var(--text-faint);
+}
+
+.comment-text {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text);
+    white-space: pre-line;
+    word-break: break-word;
+}
+
+.comment-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 2px;
 }
 
 .catalog-section {
@@ -688,7 +915,7 @@ a {
 
 .title-card-poster {
     position: relative;
-    height: 190px;
+    height: 220px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -830,15 +1057,7 @@ a {
     color: var(--text-muted);
 }
 
-.reviews-layout {
-    display: grid;
-    grid-template-columns: 380px 1fr;
-    gap: 24px;
-    align-items: start;
-}
-
-.panel-form,
-.reviews-list-panel {
+.panel-form {
     padding: 20px;
     background: var(--surface);
     border: 1px solid var(--border);
@@ -852,53 +1071,6 @@ a {
     margin: 0;
     font-size: 16px;
     font-weight: 700;
-}
-
-.reviews-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.review-card {
-    padding: 14px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.review-card-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-.review-score {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--star-active);
-}
-
-.review-card-title {
-    margin: 0;
-    font-size: 14px;
-    font-weight: 700;
-}
-
-.review-card-comment {
-    margin: 0;
-    font-size: 13px;
-    color: var(--text-muted);
-    white-space: pre-line;
-}
-
-.review-card-actions {
-    display: flex;
-    gap: 8px;
 }
 
 .field {
@@ -1110,9 +1282,12 @@ a {
 }
 
 @media (max-width: 900px) {
-    .details-section,
-    .reviews-layout {
+    .details-section {
         grid-template-columns: 1fr;
+    }
+
+    .poster-box {
+        max-width: 280px;
     }
 
     .form-grid-3 {

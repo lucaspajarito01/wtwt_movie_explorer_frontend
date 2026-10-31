@@ -34,14 +34,16 @@ const els = {
   btnEditOwn: document.querySelector('#btn-edit-own'),
   btnNewProposal: document.querySelector('#btn-new-proposal'),
   navProposals: document.querySelector('#nav-proposals'),
-  heroBackdrop: document.querySelector('#hero-backdrop'),
+  bannerImg: document.querySelector('#movie-banner-img'),
   movieCategoryBadge: document.querySelector('#movie-category-badge'),
   movieStatusBadge: document.querySelector('#movie-status-badge'),
   movieTitle: document.querySelector('#movie-title'),
   movieMeta: document.querySelector('#movie-meta'),
   btnTrailer: document.querySelector('#btn-trailer'),
   posterImg: document.querySelector('#movie-poster-img'),
-  posterFallback: document.querySelector('#movie-poster-fallback'),
+  sidebarRatingAvg: document.querySelector('#sidebar-rating-avg'),
+  sidebarStarRating: document.querySelector('#sidebar-star-rating'),
+  sidebarRatingHint: document.querySelector('#sidebar-rating-hint'),
   movieYearPill: document.querySelector('#movie-year-pill'),
   movieDescription: document.querySelector('#movie-description'),
   movieTags: document.querySelector('#movie-tags'),
@@ -78,12 +80,12 @@ const els = {
   proposalsGrid: document.querySelector('#proposals-grid'),
   proposalsEmpty: document.querySelector('#proposals-empty'),
   categoriesShowcase: document.querySelector('#categories-showcase'),
+  reviewsHeading: document.querySelector('#reviews-heading'),
+  reviewsSubtitle: document.querySelector('#reviews-subtitle'),
+  commentsCountBadge: document.querySelector('#comments-count-badge'),
   reviewForm: document.querySelector('#review-form'),
-  reviewFormTitle: document.querySelector('#review-form-title'),
   reviewIdInput: document.querySelector('#review-id'),
-  reviewMovieIdInput: document.querySelector('#review-movie-id'),
-  reviewRatingInput: document.querySelector('#review-rating'),
-  reviewTitleInput: document.querySelector('#review-title'),
+  commentStarRating: document.querySelector('#comment-star-rating'),
   reviewCommentInput: document.querySelector('#review-comment'),
   btnCancelReview: document.querySelector('#btn-cancel-review'),
   userReviewsList: document.querySelector('#user-reviews-list'),
@@ -97,6 +99,182 @@ const els = {
   btnCloseModal: document.querySelector('#btn-close-modal'),
   btnCancelModal: document.querySelector('#btn-cancel-modal'),
 };
+
+function isPlaceholderUrl(url) {
+  if (!url || typeof url !== 'string') return true;
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname === 'example.com' || parsed.hostname.endsWith('.example.com');
+  } catch {
+    return true;
+  }
+}
+
+function buildSvgDataUri(titleText, subtitleText, width, height) {
+  const safeTitle = String(titleText || 'WTWT').replace(/[<>&"']/g, '');
+  const safeSub = String(subtitleText || '').replace(/[<>&"']/g, '');
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+    <defs>
+      <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#1c2230"/>
+        <stop offset="55%" stop-color="#2a3346"/>
+        <stop offset="100%" stop-color="#e5484d"/>
+      </linearGradient>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#g)"/>
+    <text x="50%" y="48%" fill="#edeef0" font-family="system-ui,sans-serif" font-size="24" font-weight="800" text-anchor="middle">${safeTitle}</text>
+    <text x="50%" y="58%" fill="#b8bcc8" font-family="system-ui,sans-serif" font-size="14" font-weight="600" text-anchor="middle">${safeSub}</text>
+  </svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+function getFallbackPosterUrl(title) {
+  const seed = encodeURIComponent(`wtwt-poster-${title?.id || title?.title || 'default'}`);
+  return `https://picsum.photos/seed/${seed}/450/675`;
+}
+
+function getFallbackBannerUrl(title) {
+  const seed = encodeURIComponent(`wtwt-banner-${title?.id || title?.title || 'default'}`);
+  return `https://picsum.photos/seed/${seed}/1280/520`;
+}
+
+function applyPosterImage(imgEl, title) {
+  const fallbackUrl = getFallbackPosterUrl(title);
+  const svgBackup = buildSvgDataUri(title?.title || 'WTWT', title?.category || 'Póster', 450, 675);
+  const primaryUrl = !isPlaceholderUrl(title?.posterUrl) ? title.posterUrl : fallbackUrl;
+
+  imgEl.dataset.fallbackStage = primaryUrl === fallbackUrl ? '1' : '0';
+  imgEl.alt = `Póster de ${title?.title || 'película'}`;
+  imgEl.onerror = () => {
+    if (imgEl.dataset.fallbackStage === '0') {
+      imgEl.dataset.fallbackStage = '1';
+      imgEl.src = fallbackUrl;
+    } else if (imgEl.dataset.fallbackStage === '1') {
+      imgEl.dataset.fallbackStage = '2';
+      imgEl.src = svgBackup;
+    }
+  };
+  imgEl.src = primaryUrl;
+}
+
+function applyBannerImage(imgEl, title) {
+  const fallbackUrl = getFallbackBannerUrl(title);
+  const svgBackup = buildSvgDataUri(title?.title || 'WTWT', title?.category || 'Banner', 1280, 520);
+  const primaryUrl = !isPlaceholderUrl(title?.bannerUrl) ? title.bannerUrl : fallbackUrl;
+
+  imgEl.dataset.fallbackStage = primaryUrl === fallbackUrl ? '1' : '0';
+  imgEl.alt = `Banner de ${title?.title || 'película'}`;
+  imgEl.onerror = () => {
+    if (imgEl.dataset.fallbackStage === '0') {
+      imgEl.dataset.fallbackStage = '1';
+      imgEl.src = fallbackUrl;
+    } else if (imgEl.dataset.fallbackStage === '1') {
+      imgEl.dataset.fallbackStage = '2';
+      imgEl.src = svgBackup;
+    }
+  };
+  imgEl.src = primaryUrl;
+}
+
+function currentUserKey() {
+  return state.user ? `user_${state.user.id}` : 'guest';
+}
+
+function movieStarsStorageKey(movieId) {
+  return `wtwt_movie_stars_${movieId}`;
+}
+
+function getMovieStarsMap(movieId) {
+  if (!movieId) return {};
+  try {
+    const raw = JSON.parse(localStorage.getItem(movieStarsStorageKey(movieId)) || '{}');
+    return raw && typeof raw === 'object' ? raw : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveUserMovieStar(movieId, stars) {
+  if (!movieId) return;
+  const numStars = Math.min(5, Math.max(1, Number(stars) || 5));
+  const map = getMovieStarsMap(movieId);
+  map[currentUserKey()] = numStars;
+  try {
+    localStorage.setItem(movieStarsStorageKey(movieId), JSON.stringify(map));
+  } catch {
+  }
+}
+
+function getUserMovieStar(movieId) {
+  const map = getMovieStarsMap(movieId);
+  const val = Number(map[currentUserKey()]);
+  return val >= 1 && val <= 5 ? val : null;
+}
+
+function movieCommentsStorageKey(movieId) {
+  return `wtwt_movie_comments_${movieId}`;
+}
+
+function getMovieComments(movieId) {
+  if (!movieId) return [];
+  try {
+    const raw = JSON.parse(localStorage.getItem(movieCommentsStorageKey(movieId)) || '[]');
+    return Array.isArray(raw) ? raw : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveMovieComments(movieId, list) {
+  if (!movieId) return;
+  try {
+    localStorage.setItem(movieCommentsStorageKey(movieId), JSON.stringify(list));
+  } catch {
+  }
+}
+
+function computeMovieStarSummary(movieId) {
+  const map = { ...getMovieStarsMap(movieId) };
+  const comments = getMovieComments(movieId);
+
+  for (const item of comments) {
+    const key = item.userKey || `comment_${item.id}`;
+    if (!map[key] && item.rating) {
+      map[key] = Number(item.rating);
+    }
+  }
+
+  const values = Object.values(map)
+    .map((v) => Number(v))
+    .filter((v) => v >= 1 && v <= 5);
+
+  if (values.length === 0) {
+    return { average: 0, count: 0 };
+  }
+
+  const sum = values.reduce((acc, n) => acc + n, 0);
+  return {
+    average: Math.round((sum / values.length) * 10) / 10,
+    count: values.length,
+  };
+}
+
+function formatStarsText(stars) {
+  const filled = Math.min(5, Math.max(1, Math.round(Number(stars) || 5)));
+  return '★'.repeat(filled) + '☆'.repeat(5 - filled);
+}
+
+function setRadioStarGroup(container, value) {
+  const inputs = container.querySelectorAll('input[type="radio"]');
+  inputs.forEach((input) => {
+    input.checked = Number(input.value) === Number(value);
+  });
+}
+
+function getRadioStarGroupValue(container) {
+  const checked = container.querySelector('input[type="radio"]:checked');
+  return checked ? Number(checked.value) : 5;
+}
 
 function proposalsStorageKey() {
   return state.user ? `wtwt_proposals_${state.user.id}` : null;
@@ -126,36 +304,6 @@ function saveProposalId(id) {
   }
 }
 
-function reviewsStorageKey() {
-  return state.user ? `wtwt_reviews_${state.user.id}` : 'wtwt_reviews_guest';
-}
-
-function getSavedReviews() {
-  try {
-    const raw = JSON.parse(localStorage.getItem(reviewsStorageKey()) || '[]');
-    return Array.isArray(raw) ? raw : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveReviewEntry(review) {
-  const all = getSavedReviews().filter((item) => Number(item.id) !== Number(review.id));
-  all.unshift(review);
-  try {
-    localStorage.setItem(reviewsStorageKey(), JSON.stringify(all));
-  } catch {
-  }
-}
-
-function removeSavedReviewEntry(id) {
-  const all = getSavedReviews().filter((item) => Number(item.id) !== Number(id));
-  try {
-    localStorage.setItem(reviewsStorageKey(), JSON.stringify(all));
-  } catch {
-  }
-}
-
 function canEditTitle(title) {
   if (!state.user || !title) return false;
   if (state.user.role === ROLES.ADMIN) return true;
@@ -174,21 +322,68 @@ function setLinkOrEmpty(linkEl, emptyEl, url, label) {
   }
 }
 
+function updateHeroMetaLine(title) {
+  if (!title) {
+    els.movieMeta.textContent = 'Selecciona o busca un título para consultar todos sus datos.';
+    return;
+  }
+  const { average, count } = computeMovieStarSummary(title.id);
+  const starPart = count > 0 ? `★ ${average.toFixed(1)} (${count})` : '★ Sin calificar';
+  const metaParts = [
+    title.year,
+    title.ageRating || 'Sin clasificación',
+    title.duration || 'Duración no especificada',
+    title.director ? `Dir. ${title.director}` : null,
+    title.platform || null,
+    title.language || null,
+    starPart,
+  ].filter(Boolean);
+  els.movieMeta.textContent = metaParts.join(' · ');
+}
+
+function renderSidebarStars(title) {
+  if (!title) {
+    setRadioStarGroup(els.sidebarStarRating, 0);
+    els.sidebarRatingAvg.textContent = '★ Sin votos';
+    els.sidebarRatingHint.textContent = 'Selecciona una película para calificarla.';
+    return;
+  }
+
+  const userStar = getUserMovieStar(title.id);
+  const { average, count } = computeMovieStarSummary(title.id);
+
+  setRadioStarGroup(els.sidebarStarRating, userStar || 0);
+  setRadioStarGroup(els.commentStarRating, userStar || 5);
+
+  if (count > 0) {
+    els.sidebarRatingAvg.textContent = `★ ${average.toFixed(1)} / 5 (${count})`;
+  } else {
+    els.sidebarRatingAvg.textContent = '★ Sin votos';
+  }
+
+  if (userStar) {
+    els.sidebarRatingHint.textContent = `Tu calificación en "${title.title}": ${formatStarsText(userStar)} (${userStar}/5)`;
+  } else {
+    els.sidebarRatingHint.textContent = `Haz clic en una estrella para calificar "${title.title}".`;
+  }
+
+  updateHeroMetaLine(title);
+}
+
 function renderSelectedTitle(title) {
   state.selectedTitle = title;
+  resetCommentComposer();
 
   if (!title) {
     els.movieCategoryBadge.textContent = 'CATÁLOGO · WTWT';
     els.movieStatusBadge.textContent = 'Sin selección';
     els.movieStatusBadge.className = 'status-pill status-pendiente';
     els.movieTitle.textContent = 'No hay títulos disponibles';
-    els.movieMeta.textContent = 'Sé el primero en proponer una película, serie o anime.';
-    els.heroBackdrop.style.backgroundImage = '';
+    updateHeroMetaLine(null);
+    els.bannerImg.src = buildSvgDataUri('WTWT', 'Explora el catálogo', 1280, 520);
+    els.posterImg.src = buildSvgDataUri('WTWT', 'Sin póster', 450, 675);
     els.btnTrailer.hidden = true;
     els.btnEditOwn.hidden = true;
-    els.posterImg.hidden = true;
-    els.posterFallback.hidden = false;
-    els.posterFallback.textContent = '[SIN PÓSTER]';
     els.movieYearPill.textContent = '—';
     els.movieDescription.textContent = 'No se encontró ningún título para mostrar en la vista detallada.';
     els.movieTags.replaceChildren();
@@ -207,8 +402,8 @@ function renderSelectedTitle(title) {
     setLinkOrEmpty(els.specPosterUrl, els.specPosterEmpty, null);
     setLinkOrEmpty(els.specBannerUrl, els.specBannerEmpty, null);
     setLinkOrEmpty(els.specTrailerUrl, els.specTrailerEmpty, null);
-    els.reviewMovieIdInput.value = '';
-    renderUserReviews();
+    renderSidebarStars(null);
+    renderMovieComments();
     highlightSelectedCard();
     return;
   }
@@ -219,23 +414,8 @@ function renderSelectedTitle(title) {
   els.movieStatusBadge.className = `status-pill ${title.status === 'aprobado' ? 'status-aprobado' : 'status-pendiente'}`;
   els.movieTitle.textContent = title.title;
 
-  const metaParts = [
-    title.year,
-    title.ageRating || 'Sin clasificación',
-    title.duration || 'Duración no especificada',
-    title.director ? `Dir. ${title.director}` : null,
-    title.platform || null,
-    title.language || null,
-  ].filter(Boolean);
-  els.movieMeta.textContent = metaParts.join(' · ');
-
-  if (title.bannerUrl) {
-    els.heroBackdrop.style.backgroundImage = `url('${title.bannerUrl.replace(/'/g, "\\'")}')`;
-  } else if (title.posterUrl) {
-    els.heroBackdrop.style.backgroundImage = `url('${title.posterUrl.replace(/'/g, "\\'")}')`;
-  } else {
-    els.heroBackdrop.style.backgroundImage = '';
-  }
+  applyBannerImage(els.bannerImg, title);
+  applyPosterImage(els.posterImg, title);
 
   if (title.trailerUrl) {
     els.btnTrailer.href = title.trailerUrl;
@@ -245,17 +425,6 @@ function renderSelectedTitle(title) {
   }
 
   els.btnEditOwn.hidden = !canEditTitle(title);
-
-  if (title.posterUrl) {
-    els.posterImg.src = title.posterUrl;
-    els.posterImg.alt = `Póster de ${title.title}`;
-    els.posterImg.hidden = false;
-    els.posterFallback.hidden = true;
-  } else {
-    els.posterImg.hidden = true;
-    els.posterFallback.hidden = false;
-    els.posterFallback.textContent = title.title;
-  }
 
   els.movieYearPill.textContent = `Año ${title.year}`;
   els.movieDescription.textContent = title.description || 'Sin descripción registrada.';
@@ -295,16 +464,13 @@ function renderSelectedTitle(title) {
   setLinkOrEmpty(els.specBannerUrl, els.specBannerEmpty, title.bannerUrl, title.bannerUrl);
   setLinkOrEmpty(els.specTrailerUrl, els.specTrailerEmpty, title.trailerUrl, title.trailerUrl);
 
-  els.reviewMovieIdInput.value = String(title.id);
-  renderUserReviews();
+  els.reviewsHeading.textContent = `Reseñas y comentarios · ${title.title}`;
+  els.reviewsSubtitle.textContent = `Las estrellas y comentarios mostrados aquí pertenecen únicamente a "${title.title}".`;
+
+  renderSidebarStars(title);
+  renderMovieComments();
   highlightSelectedCard();
 }
-
-els.posterImg.addEventListener('error', () => {
-  els.posterImg.hidden = true;
-  els.posterFallback.hidden = false;
-  els.posterFallback.textContent = state.selectedTitle?.title || '[SIN PÓSTER]';
-});
 
 function highlightSelectedCard() {
   const selectedId = state.selectedTitle?.id;
@@ -324,23 +490,10 @@ function createTitleCard(title) {
   const posterWrap = document.createElement('div');
   posterWrap.className = 'title-card-poster';
 
-  if (title.posterUrl) {
-    const img = document.createElement('img');
-    img.src = title.posterUrl;
-    img.alt = `Póster de ${title.title}`;
-    img.loading = 'lazy';
-    img.addEventListener('error', () => {
-      img.remove();
-      const span = document.createElement('span');
-      span.textContent = title.title;
-      posterWrap.append(span);
-    });
-    posterWrap.append(img);
-  } else {
-    const span = document.createElement('span');
-    span.textContent = title.title;
-    posterWrap.append(span);
-  }
+  const img = document.createElement('img');
+  img.loading = 'lazy';
+  applyPosterImage(img, title);
+  posterWrap.append(img);
 
   const badges = document.createElement('div');
   badges.className = 'title-card-badges';
@@ -363,10 +516,13 @@ function createTitleCard(title) {
   heading.className = 'title-card-heading';
   heading.textContent = title.title;
 
+  const { average, count } = computeMovieStarSummary(title.id);
+  const starText = count > 0 ? `★ ${average.toFixed(1)}` : '★ S/C';
+
   const meta = document.createElement('p');
   meta.className = 'title-card-meta';
   meta.textContent = [
-    `ID #${title.id}`,
+    starText,
     title.year,
     title.ageRating,
     title.duration,
@@ -393,7 +549,7 @@ function createTitleCard(title) {
   const viewBtn = document.createElement('button');
   viewBtn.type = 'button';
   viewBtn.className = 'btn-action btn-trailer btn-compact';
-  viewBtn.textContent = 'Ver ficha';
+  viewBtn.textContent = 'Ver película';
   viewBtn.addEventListener('click', () => {
     renderSelectedTitle(title);
     document.querySelector('#detalle-section')?.scrollIntoView({ behavior: 'smooth' });
@@ -626,6 +782,222 @@ async function loadUserProposals() {
   }
 }
 
+els.sidebarStarRating.addEventListener('change', (event) => {
+  const input = event.target.closest('input[type="radio"]');
+  if (!input || !state.selectedTitle) return;
+
+  const stars = Number(input.value);
+  saveUserMovieStar(state.selectedTitle.id, stars);
+  renderSidebarStars(state.selectedTitle);
+  renderCatalog();
+  showToast(`Calificaste "${state.selectedTitle.title}" con ${stars} estrella(s).`);
+});
+
+function renderMovieComments() {
+  const movie = state.selectedTitle;
+  els.userReviewsList.replaceChildren();
+
+  if (!movie) {
+    els.commentsCountBadge.textContent = '0 comentarios';
+    els.userReviewsEmpty.hidden = false;
+    return;
+  }
+
+  const comments = getMovieComments(movie.id);
+  els.commentsCountBadge.textContent =
+    comments.length === 1 ? '1 comentario' : `${comments.length} comentarios`;
+
+  if (comments.length === 0) {
+    els.userReviewsEmpty.textContent = `Aún no hay comentarios para "${movie.title}". ¡Sé el primero en comentar!`;
+    els.userReviewsEmpty.hidden = false;
+    return;
+  }
+
+  els.userReviewsEmpty.hidden = true;
+
+  for (const item of comments) {
+    const article = document.createElement('article');
+    article.className = 'comment-item';
+
+    const avatar = document.createElement('div');
+    avatar.className = 'comment-avatar';
+    const authorName = item.username || 'Usuario';
+    avatar.textContent = authorName.slice(0, 2).toUpperCase();
+
+    const body = document.createElement('div');
+    body.className = 'comment-body';
+
+    const metaRow = document.createElement('div');
+    metaRow.className = 'comment-meta-row';
+
+    const authorWrap = document.createElement('div');
+    authorWrap.className = 'comment-author-wrap';
+
+    const authorEl = document.createElement('span');
+    authorEl.className = 'comment-author';
+    authorEl.textContent = authorName;
+
+    const starsEl = document.createElement('span');
+    starsEl.className = 'comment-stars';
+    starsEl.textContent = formatStarsText(item.rating);
+
+    authorWrap.append(authorEl, starsEl);
+
+    const dateEl = document.createElement('span');
+    dateEl.className = 'comment-date';
+    dateEl.textContent = item.dateLabel || 'Reciente';
+
+    metaRow.append(authorWrap, dateEl);
+
+    const textEl = document.createElement('p');
+    textEl.className = 'comment-text';
+    textEl.textContent = item.comment;
+
+    body.append(metaRow, textEl);
+
+    const isOwner =
+      item.userKey === currentUserKey() ||
+      (state.user && Number(item.userId) === Number(state.user.id));
+
+    if (isOwner) {
+      const actions = document.createElement('div');
+      actions.className = 'comment-actions';
+
+      const editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'btn-action btn-watchlist btn-compact';
+      editBtn.textContent = 'Editar';
+      editBtn.addEventListener('click', () => {
+        els.reviewIdInput.value = String(item.id);
+        setRadioStarGroup(els.commentStarRating, item.rating || 5);
+        els.reviewCommentInput.value = item.comment || '';
+        els.btnCancelReview.hidden = false;
+        els.reviewCommentInput.focus();
+      });
+
+      const delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'btn-action btn-danger btn-compact';
+      delBtn.textContent = 'Eliminar';
+      delBtn.addEventListener('click', async () => {
+        const token = getToken();
+        if (token && item.backendSync) {
+          try {
+            await api(`/reviews/${item.id}`, { method: 'DELETE', token });
+          } catch {
+          }
+        }
+        const next = getMovieComments(movie.id).filter((c) => String(c.id) !== String(item.id));
+        saveMovieComments(movie.id, next);
+        renderSidebarStars(movie);
+        renderMovieComments();
+        renderCatalog();
+        showToast('Comentario eliminado.');
+      });
+
+      actions.append(editBtn, delBtn);
+      body.append(actions);
+    }
+
+    article.append(avatar, body);
+    els.userReviewsList.append(article);
+  }
+}
+
+function resetCommentComposer() {
+  clearFormErrors(els.reviewForm);
+  els.reviewIdInput.value = '';
+  els.reviewCommentInput.value = '';
+  const currentStar = state.selectedTitle ? getUserMovieStar(state.selectedTitle.id) || 5 : 5;
+  setRadioStarGroup(els.commentStarRating, currentStar);
+  els.btnCancelReview.hidden = true;
+}
+
+els.btnCancelReview.addEventListener('click', resetCommentComposer);
+
+els.reviewForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const movie = state.selectedTitle;
+  if (!movie) return;
+
+  const comment = els.reviewCommentInput.value.trim();
+  if (!comment) {
+    showFormError(
+      els.reviewForm,
+      new ApiError('Escribe un comentario para publicar tu reseña.', 400, [
+        { field: 'comment', message: 'El comentario no puede estar vacío' },
+      ]),
+    );
+    return;
+  }
+
+  const stars = getRadioStarGroupValue(els.commentStarRating);
+  const editId = els.reviewIdInput.value.trim();
+
+  setBusy(els.reviewForm, true);
+  try {
+    let backendId = null;
+    let backendSync = false;
+    const token = getToken();
+
+    if (token) {
+      try {
+        const res = await api(editId ? `/reviews/${editId}` : '/reviews', {
+          method: editId ? 'PATCH' : 'POST',
+          body: editId
+            ? { rating: stars, comment }
+            : { movieId: movie.id, rating: stars, comment },
+          token,
+        });
+        if (res?.data?.id) {
+          backendId = res.data.id;
+          backendSync = true;
+        }
+      } catch {
+      }
+    }
+
+    saveUserMovieStar(movie.id, stars);
+
+    const existing = getMovieComments(movie.id);
+    const nowLabel = new Date().toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+
+    if (editId) {
+      const updated = existing.map((item) =>
+        String(item.id) === String(editId)
+          ? { ...item, rating: stars, comment, dateLabel: `${nowLabel} (editado)` }
+          : item,
+      );
+      saveMovieComments(movie.id, updated);
+    } else {
+      const entry = {
+        id: backendId || Date.now(),
+        movieId: movie.id,
+        userId: state.user?.id || null,
+        userKey: currentUserKey(),
+        username: state.user?.username || 'Visitante',
+        rating: stars,
+        comment,
+        dateLabel: nowLabel,
+        backendSync,
+      };
+      saveMovieComments(movie.id, [entry, ...existing]);
+    }
+
+    resetCommentComposer();
+    renderSidebarStars(movie);
+    renderMovieComments();
+    renderCatalog();
+    showToast(editId ? 'Comentario actualizado.' : 'Comentario publicado.');
+  } finally {
+    setBusy(els.reviewForm, false);
+  }
+});
+
 function openTitleModal(titleToEdit = null) {
   if (!state.user) {
     location.href = LOGIN_URL;
@@ -716,145 +1088,6 @@ els.titleForm.addEventListener('submit', async (event) => {
     showFormError(els.titleForm, err instanceof ApiError ? err : new ApiError(err.message));
   } finally {
     setBusy(els.titleForm, false);
-  }
-});
-
-function renderUserReviews() {
-  const currentMovieId = state.selectedTitle?.id;
-  const reviews = getSavedReviews().filter(
-    (item) => !currentMovieId || Number(item.movieId) === Number(currentMovieId),
-  );
-
-  els.userReviewsList.replaceChildren();
-  if (reviews.length === 0) {
-    els.userReviewsEmpty.hidden = false;
-    return;
-  }
-
-  els.userReviewsEmpty.hidden = true;
-
-  for (const rev of reviews) {
-    const card = document.createElement('article');
-    card.className = 'review-card';
-
-    const top = document.createElement('div');
-    top.className = 'review-card-top';
-
-    const score = document.createElement('span');
-    score.className = 'review-score';
-    score.textContent = `★ ${rev.rating} / 10`;
-
-    const meta = document.createElement('span');
-    meta.className = 'category-card-id';
-    meta.textContent = `Reseña #${rev.id} · Título #${rev.movieId}`;
-
-    top.append(score, meta);
-
-    const title = document.createElement('h4');
-    title.className = 'review-card-title';
-    title.textContent = rev.title || 'Reseña sin título';
-
-    const comment = document.createElement('p');
-    comment.className = 'review-card-comment';
-    comment.textContent = rev.comment || 'Sin comentario adicional.';
-
-    const actions = document.createElement('div');
-    actions.className = 'review-card-actions';
-
-    const editBtn = document.createElement('button');
-    editBtn.type = 'button';
-    editBtn.className = 'btn-action btn-watchlist btn-compact';
-    editBtn.textContent = 'Editar';
-    editBtn.addEventListener('click', () => {
-      els.reviewIdInput.value = String(rev.id);
-      els.reviewMovieIdInput.value = String(rev.movieId);
-      els.reviewRatingInput.value = String(rev.rating);
-      els.reviewTitleInput.value = rev.title || '';
-      els.reviewCommentInput.value = rev.comment || '';
-      els.reviewFormTitle.textContent = `Editar reseña #${rev.id}`;
-      els.btnCancelReview.hidden = false;
-      els.reviewForm.scrollIntoView({ behavior: 'smooth' });
-    });
-
-    const delBtn = document.createElement('button');
-    delBtn.type = 'button';
-    delBtn.className = 'btn-action btn-danger btn-compact';
-    delBtn.textContent = 'Eliminar';
-    delBtn.addEventListener('click', async () => {
-      try {
-        await api(`/reviews/${rev.id}`, {
-          method: 'DELETE',
-          token: getToken(),
-        });
-      } catch {
-      }
-      removeSavedReviewEntry(rev.id);
-      renderUserReviews();
-      showToast('Reseña eliminada.');
-    });
-
-    actions.append(editBtn, delBtn);
-    card.append(top, title, comment, actions);
-    els.userReviewsList.append(card);
-  }
-}
-
-function resetReviewForm() {
-  clearFormErrors(els.reviewForm);
-  els.reviewIdInput.value = '';
-  els.reviewRatingInput.value = '8';
-  els.reviewTitleInput.value = '';
-  els.reviewCommentInput.value = '';
-  els.reviewMovieIdInput.value = state.selectedTitle ? String(state.selectedTitle.id) : '';
-  els.reviewFormTitle.textContent = 'Publicar reseña';
-  els.btnCancelReview.hidden = true;
-}
-
-els.btnCancelReview.addEventListener('click', resetReviewForm);
-
-els.reviewForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  if (!state.user) {
-    location.href = LOGIN_URL;
-    return;
-  }
-
-  const editId = els.reviewIdInput.value.trim();
-  const movieId = Number(els.reviewMovieIdInput.value);
-  const rating = Number(els.reviewRatingInput.value);
-  const title = els.reviewTitleInput.value.trim();
-  const comment = els.reviewCommentInput.value.trim();
-
-  const body = {
-    rating,
-    title: title || null,
-    comment: comment || null,
-  };
-  if (!editId) body.movieId = movieId;
-
-  setBusy(els.reviewForm, true);
-  try {
-    const res = await api(editId ? `/reviews/${editId}` : '/reviews', {
-      method: editId ? 'PATCH' : 'POST',
-      body,
-      token: getToken(),
-    });
-    const saved = res?.data || {
-      id: editId ? Number(editId) : Date.now(),
-      movieId,
-      userId: state.user.id,
-      rating,
-      title: body.title,
-      comment: body.comment,
-    };
-    saveReviewEntry(saved);
-    resetReviewForm();
-    renderUserReviews();
-    showToast(res?.message || 'Reseña guardada correctamente.');
-  } catch (err) {
-    showFormError(els.reviewForm, err instanceof ApiError ? err : new ApiError(err.message));
-  } finally {
-    setBusy(els.reviewForm, false);
   }
 });
 
