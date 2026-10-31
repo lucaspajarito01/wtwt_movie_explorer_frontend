@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración · WTWT</title>
+    <link rel="stylesheet" href="../css/peliculas-style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-left">
+            <a href="./peliculas.html" class="brand">WTWT</a>
+        </div>
+        <div class="header-right" data-auth-slot>
+            <a href="../../Index.html" class="btn-entrar">Entrar</a>
+        </div>
+    </header>
+
+    <main class="status-main">
+        <p id="guard-status" class="status-message">Verificando tu sesión…</p>
+
+        <section id="admin-content" class="admin-content" aria-label="Panel de administración" hidden>
+            <h1 class="admin-title">Panel de administración</h1>
+            <p class="admin-subtitle">Gestión de categorías y aprobación de títulos, pendiente de implementar (ME-21).</p>
+        </section>
+    </main>
+
+    <script type="module" src="../Js/header.js"></script>
+    <script type="module" src="../Js/admin.js"></script>
+</body>
+</html>
