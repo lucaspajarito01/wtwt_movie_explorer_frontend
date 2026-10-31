@@ -38,3 +38,4 @@ export function setBusy(form, busy) {
   button.disabled = busy;
   button.textContent = busy ? 'Espera…' : button.dataset.label;
 }
+

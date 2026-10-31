@@ -19,3 +19,4 @@ try {
 } catch {
   status.textContent = 'No se pudo verificar tu sesión. Revisa que el servidor esté en marcha.';
 }
+

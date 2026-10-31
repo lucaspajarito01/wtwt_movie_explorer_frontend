@@ -38,3 +38,4 @@ async function renderSlot(container) {
 
   container.append(name, logout);
 }
+
