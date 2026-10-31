@@ -37,7 +37,6 @@ a {
     text-decoration: none;
 }
 
-/* Encabezado */
 .site-header {
     display: flex;
     align-items: center;
@@ -130,14 +129,12 @@ a {
     background: var(--accent-hover);
 }
 
-/* Contenido principal */
 .movie-main {
     flex: 1;
     display: flex;
     flex-direction: column;
 }
 
-/* Sección Hero */
 .hero {
     min-height: 360px;
     display: flex;
@@ -218,7 +215,6 @@ a {
     background: rgba(255, 255, 255, 0.12);
 }
 
-/* Sección de Detalles */
 .details-section {
     display: grid;
     grid-template-columns: 330px 1fr;
@@ -285,7 +281,6 @@ a {
     color: var(--star-active);
 }
 
-/* Columna derecha de información */
 .details-content {
     display: flex;
     flex-direction: column;
@@ -317,7 +312,6 @@ a {
     border-radius: 999px;
 }
 
-/* Reparto principal */
 .cast-heading {
     margin: 0 0 14px;
     font-size: 16px;
@@ -357,7 +351,6 @@ a {
     color: var(--text-muted);
 }
 
-/* Accesibilidad de foco */
 .brand:focus-visible,
 .nav-link:focus-visible,
 .btn-entrar:focus-visible,
@@ -366,7 +359,54 @@ a {
     outline-offset: 2px;
 }
 
-/* Movimiento reducido */
+[hidden] {
+    display: none !important;
+}
+
+.header-auth {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-name {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.btn-logout {
+    font: inherit;
+    border: 1px solid var(--border-strong);
+    background: rgba(255, 255, 255, 0.06);
+    cursor: pointer;
+}
+
+.btn-logout:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.status-main,
+.admin-content {
+    padding: 48px clamp(16px, 4vw, 32px);
+}
+
+.status-message {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.admin-title {
+    margin: 0 0 8px;
+    font-size: 28px;
+}
+
+.admin-subtitle {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -375,7 +415,6 @@ a {
     }
 }
 
-/* Responsivo */
 @media (max-width: 768px) {
     .site-header {
         flex-wrap: wrap;
@@ -389,4 +428,3 @@ a {
         width: 160px;
     }
 }
-
