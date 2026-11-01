@@ -1,7 +1,7 @@
 import { fetchCurrentUser, clearSession } from './session.js';
 import { ROLES } from './roles.js';
 
-const LOGIN_URL = new URL('../../Index.html', import.meta.url).href;
+const LOGIN_URL = new URL('../../index.html', import.meta.url).href;
 const REGISTER_URL = new URL('../html/registro.html', import.meta.url).href;
 const ADMIN_URL = new URL('../html/admin.html', import.meta.url).href;
 const CATALOG_URL = new URL('../html/peliculas.html', import.meta.url).href;

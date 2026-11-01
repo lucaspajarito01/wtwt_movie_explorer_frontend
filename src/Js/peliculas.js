@@ -3,7 +3,7 @@ import { fetchCurrentUser, getToken } from './session.js';
 import { ROLES } from './roles.js';
 import { clearFormErrors, showFormError, setBusy, showToast } from './ui.js';
 
-const LOGIN_URL = new URL('../../Index.html', import.meta.url).href;
+const LOGIN_URL = new URL('../../index.html', import.meta.url).href;
 const OPTIONAL_TITLE_FIELDS = [
   'duration',
   'ageRating',

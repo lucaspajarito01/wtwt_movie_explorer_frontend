@@ -12,7 +12,7 @@ Aplicación web para explorar un catálogo de películas, series y anime, crear 
 ## Estructura del proyecto
 
 ```text
-Index.html                 Página de inicio de sesión
+index.html                 Página de inicio de sesión
 assets/                    Recursos estáticos
 src/
   Js/                      Lógica de autenticación, sesión, catálogo y administración
@@ -35,7 +35,7 @@ Desde la raíz del proyecto, inicia un servidor estático:
 python -m http.server 5500
 ```
 
-Abre `http://localhost:5500/Index.html`. También puedes usar la extensión **Live Server** de VS Code. Para cambiar el endpoint del backend, actualiza `API_BASE` en `src/Js/config.js`.
+Abre `http://localhost:5500/index.html`. También puedes usar la extensión **Live Server** de VS Code. Para cambiar el endpoint del backend, actualiza `API_BASE` en `src/Js/config.js`.
 
 No hay `package.json` ni scripts de npm configurados; no se requiere instalar dependencias para servir el frontend.
 
