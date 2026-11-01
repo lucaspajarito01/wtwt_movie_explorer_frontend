@@ -1,2 +1,1 @@
-export const API_BASE = 'http://localhost:3000/api/v1';
-
+const API_URL = "https://wtwt-movie-explorer-backend.onrender.com/api/v1";
