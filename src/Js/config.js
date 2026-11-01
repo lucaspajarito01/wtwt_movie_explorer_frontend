@@ -1,1 +1,1 @@
-const API_URL = "https://wtwt-movie-explorer-backend.onrender.com/api/v1";
+const API_BASE = "https://wtwt-movie-explorer-backend.onrender.com/api/v1";
