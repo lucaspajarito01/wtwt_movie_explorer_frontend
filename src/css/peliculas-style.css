@@ -1211,6 +1211,34 @@ a {
     gap: 14px;
 }
 
+.media-url-preview {
+    width: 100%;
+    height: 128px;
+    object-fit: contain;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.media-url-preview[data-media-kind="poster"] {
+    height: 180px;
+}
+
+.media-url-status {
+    min-height: 16px;
+    margin: 0;
+    font-size: 11px;
+    color: var(--text-faint);
+}
+
+.media-url-status[data-state="valid"] {
+    color: #6ee7b7;
+}
+
+.media-url-status[data-state="invalid"] {
+    color: #fca5a5;
+}
+
 .modal-footer {
     display: flex;
     justify-content: flex-end;

@@ -31,7 +31,7 @@
                 >
             </form>
             <button type="button" id="btn-open-propose" class="btn-action btn-propose-header" hidden>
-                + Proponer título
+                + Proponer Películas
             </button>
             <div class="header-auth" data-auth-slot>
                 <a href="../../Index.html" class="btn-entrar">Entrar</a>
@@ -59,7 +59,7 @@
                         ▶ Ver tráiler
                     </a>
                     <button type="button" id="btn-hero-propose" class="btn-action btn-watchlist">
-                        + Proponer título
+                        + Proponer Películas
                     </button>
                     <button type="button" id="btn-edit-own" class="btn-action btn-watchlist" hidden>
                         ✎ Editar mi propuesta
@@ -172,27 +172,7 @@
                             <span class="spec-label">Idioma original</span>
                             <strong id="spec-language" class="spec-value">—</strong>
                         </article>
-                    </div>
-
-                    <div class="media-links-grid">
-                        <article class="spec-card">
-                            <span class="spec-label">URL del Póster</span>
-                            <a id="spec-poster-url" href="#" target="_blank" rel="noopener noreferrer" class="spec-link" hidden>Abrir póster</a>
-                            <span id="spec-poster-empty" class="spec-empty">No registrado</span>
-                        </article>
-
-                        <article class="spec-card">
-                            <span class="spec-label">URL del Banner</span>
-                            <a id="spec-banner-url" href="#" target="_blank" rel="noopener noreferrer" class="spec-link" hidden>Abrir banner</a>
-                            <span id="spec-banner-empty" class="spec-empty">No registrado</span>
-                        </article>
-
-                        <article class="spec-card">
-                            <span class="spec-label">URL del Tráiler</span>
-                            <a id="spec-trailer-url" href="#" target="_blank" rel="noopener noreferrer" class="spec-link" hidden>Abrir tráiler</a>
-                            <span id="spec-trailer-empty" class="spec-empty">No registrado</span>
-                        </article>
-                    </div>
+                    </div>                
                 </section>
 
                 <section id="resenas-section" class="movie-comments-section" aria-labelledby="reviews-heading">
@@ -255,7 +235,7 @@
         <section id="catalogo-section" class="catalog-section" aria-labelledby="catalog-heading">
             <div class="catalog-header">
                 <div>
-                    <h2 id="catalog-heading" class="section-heading">Catálogo de títulos aprobados</h2>
+                    <h2 id="catalog-heading" class="section-heading">Catálogo de Películas</h2>
                     <p id="catalog-summary" class="section-subtitle">Explora todos los títulos disponibles y filtra por categoría o búsqueda.</p>
                 </div>
 
@@ -329,7 +309,7 @@
         <div class="modal-card">
             <div class="modal-header">
                 <div>
-                    <h2 id="title-modal-heading" class="modal-title">Proponer nuevo título</h2>
+                    <h2 id="title-modal-heading" class="modal-title">Proponer nueva película</h2>
                     <p id="title-modal-subtitle" class="section-subtitle">Los títulos propuestos por usuarios quedan en estado pendiente hasta ser aprobados por un administrador.</p>
                 </div>
                 <button type="button" id="btn-close-modal" class="btn-icon" aria-label="Cerrar ventana">✕</button>
@@ -390,13 +370,17 @@
 
                 <div class="form-grid-3">
                     <div class="field">
-                        <label class="label" for="field-poster-url">URL del Póster (http/https)</label>
+                        <label class="label" for="field-poster-url">URL directa de la imagen del póster</label>
                         <input class="input" type="url" id="field-poster-url" name="posterUrl" maxlength="255" placeholder="https://.../poster.jpg">
+                        <img id="poster-url-preview" class="media-url-preview" alt="Vista previa del póster" data-media-kind="poster" hidden>
+                        <p id="poster-url-status" class="media-url-status" aria-live="polite"></p>
                     </div>
 
                     <div class="field">
-                        <label class="label" for="field-banner-url">URL del Banner (http/https)</label>
+                        <label class="label" for="field-banner-url">URL directa de la imagen del banner</label>
                         <input class="input" type="url" id="field-banner-url" name="bannerUrl" maxlength="255" placeholder="https://.../banner.jpg">
+                        <img id="banner-url-preview" class="media-url-preview" alt="Vista previa del banner" data-media-kind="banner" hidden>
+                        <p id="banner-url-status" class="media-url-status" aria-live="polite"></p>
                     </div>
 
                     <div class="field">

@@ -24,6 +24,7 @@ const state = {
   searchQuery: '',
   selectedTitle: null,
   userProposals: [],
+  reviews: [],
 };
 
 const els = {
@@ -96,6 +97,12 @@ const els = {
   titleForm: document.querySelector('#title-form'),
   titleIdField: document.querySelector('#title-id-field'),
   fieldCategory: document.querySelector('#field-category'),
+  posterUrlInput: document.querySelector('#field-poster-url'),
+  posterUrlPreview: document.querySelector('#poster-url-preview'),
+  posterUrlStatus: document.querySelector('#poster-url-status'),
+  bannerUrlInput: document.querySelector('#field-banner-url'),
+  bannerUrlPreview: document.querySelector('#banner-url-preview'),
+  bannerUrlStatus: document.querySelector('#banner-url-status'),
   btnCloseModal: document.querySelector('#btn-close-modal'),
   btnCancelModal: document.querySelector('#btn-cancel-modal'),
 };
@@ -320,6 +327,57 @@ function setLinkOrEmpty(linkEl, emptyEl, url, label) {
     linkEl.hidden = true;
     emptyEl.hidden = false;
   }
+}
+
+function updateMediaPreview(input, preview, status, label) {
+  const url = input.value.trim();
+  preview.hidden = true;
+  preview.removeAttribute('src');
+  input.dataset.imageState = url ? 'loading' : 'empty';
+  status.dataset.state = input.dataset.imageState;
+
+  if (!url) {
+    status.textContent = `Pega la URL directa de la imagen del ${label}.`;
+    return;
+  }
+
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(url);
+  } catch {
+    input.dataset.imageState = 'invalid';
+    status.dataset.state = 'invalid';
+    status.textContent = 'Escribe una URL válida que cargue una imagen.';
+    return;
+  }
+
+  if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+    input.dataset.imageState = 'invalid';
+    status.dataset.state = 'invalid';
+    status.textContent = 'La URL de la imagen debe comenzar con http:// o https://.';
+    return;
+  }
+
+  status.textContent = 'Cargando vista previa…';
+  preview.onload = () => {
+    if (input.value.trim() !== url) return;
+    input.dataset.imageState = 'valid';
+    status.dataset.state = 'valid';
+    status.textContent = 'Imagen cargada correctamente.';
+    preview.hidden = false;
+  };
+  preview.onerror = () => {
+    if (input.value.trim() !== url) return;
+    input.dataset.imageState = 'invalid';
+    status.dataset.state = 'invalid';
+    status.textContent = 'No se pudo cargar una imagen. Usa el enlace directo al archivo, no una página web.';
+  };
+  preview.src = parsedUrl.href;
+}
+
+function updateMediaPreviews() {
+  updateMediaPreview(els.posterUrlInput, els.posterUrlPreview, els.posterUrlStatus, 'póster');
+  updateMediaPreview(els.bannerUrlInput, els.bannerUrlPreview, els.bannerUrlStatus, 'banner');
 }
 
 function updateHeroMetaLine(title) {
@@ -1024,7 +1082,7 @@ function openTitleModal(titleToEdit = null) {
     els.titleForm.elements.bannerUrl.value = titleToEdit.bannerUrl || '';
     els.titleForm.elements.trailerUrl.value = titleToEdit.trailerUrl || '';
   } else {
-    els.titleModalHeading.textContent = 'Proponer nuevo título';
+    els.titleModalHeading.textContent = 'Proponer nueva película';
     els.titleModalSubtitle.textContent =
       state.user.role === ROLES.ADMIN
         ? 'Como administrador, el título se publicará directamente como aprobado.'
@@ -1032,6 +1090,7 @@ function openTitleModal(titleToEdit = null) {
     els.titleIdField.value = '';
   }
 
+  updateMediaPreviews();
   els.titleModal.hidden = false;
 }
 
@@ -1061,6 +1120,22 @@ function buildTitlePayload(formData, isUpdate) {
 
 els.titleForm.addEventListener('submit', async (event) => {
   event.preventDefault();
+  clearFormErrors(els.titleForm);
+  const invalidMediaField = [
+    { input: els.posterUrlInput, label: 'póster' },
+    { input: els.bannerUrlInput, label: 'banner' },
+  ].find(({ input }) => input.value.trim() && input.dataset.imageState !== 'valid');
+
+  if (invalidMediaField) {
+    const message = `La URL del ${invalidMediaField.label} debe cargar una imagen directa antes de guardar.`;
+    showFormError(
+      els.titleForm,
+      new ApiError(message, 0, [{ field: invalidMediaField.input.name, message }]),
+    );
+    invalidMediaField.input.focus();
+    return;
+  }
+
   const data = new FormData(els.titleForm);
   const editId = els.titleIdField.value.trim();
   const isUpdate = Boolean(editId);
@@ -1090,6 +1165,17 @@ els.titleForm.addEventListener('submit', async (event) => {
     setBusy(els.titleForm, false);
   }
 });
+
+for (const [input, preview, status, label] of [
+  [els.posterUrlInput, els.posterUrlPreview, els.posterUrlStatus, 'póster'],
+  [els.bannerUrlInput, els.bannerUrlPreview, els.bannerUrlStatus, 'banner'],
+]) {
+  input.addEventListener('input', () => {
+    input.removeAttribute('aria-invalid');
+    input.closest('.field')?.querySelector('.field-error')?.remove();
+    updateMediaPreview(input, preview, status, label);
+  });
+}
 
 els.searchForm.addEventListener('submit', (event) => {
   event.preventDefault();

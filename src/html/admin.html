@@ -16,7 +16,7 @@
                     Pendientes por aprobar
                 </button>
                 <button type="button" class="nav-tab" data-view-target="titles">
-                    Catálogo de títulos
+                    Catálogo de peliculas
                 </button>
                 <button type="button" class="nav-tab" data-view-target="categories">
                     Categorías
@@ -42,12 +42,12 @@
             <section class="admin-hero">
                 <div>
                     <p class="hero-eyebrow">PANEL DE ADMINISTRACIÓN · WTWT</p>
-                    <h1 class="admin-title">Moderación de títulos y gestión de categorías</h1>
+                    <h1 class="admin-title">Moderación de películas y gestión de categorías</h1>
                     <p class="admin-subtitle">Aprueba propuestas de usuarios, administra el catálogo completo y gestiona las categorías del sistema.</p>
                 </div>
                 <div class="admin-hero-actions">
                     <button type="button" id="btn-admin-new-title" class="btn-action btn-trailer">
-                        + Crear título aprobado
+                        + Añadir película 
                     </button>
                     <button type="button" id="btn-admin-refresh" class="btn-action btn-watchlist">
                         ↻ Actualizar datos
@@ -57,19 +57,19 @@
 
             <section class="stats-grid" aria-label="Resumen del sistema">
                 <article class="stat-card stat-card-warning">
-                    <span class="stat-label">Títulos pendientes</span>
+                    <span class="stat-label">Películas pendientes</span>
                     <strong id="stat-pending-titles" class="stat-number">0</strong>
                     <span class="stat-hint">Esperando aprobación</span>
                 </article>
 
                 <article class="stat-card stat-card-success">
-                    <span class="stat-label">Títulos aprobados</span>
+                    <span class="stat-label">Películas aprobadas</span>
                     <strong id="stat-approved-titles" class="stat-number">0</strong>
                     <span class="stat-hint">Visibles en el catálogo público</span>
                 </article>
 
                 <article class="stat-card">
-                    <span class="stat-label">Total de títulos</span>
+                    <span class="stat-label">Total películas</span>
                     <strong id="stat-total-titles" class="stat-number">0</strong>
                     <span class="stat-hint">Registros en base de datos</span>
                 </article>
@@ -84,12 +84,12 @@
             <section id="view-pending" class="admin-view" aria-labelledby="pending-view-heading">
                 <div class="view-header">
                     <div>
-                        <h2 id="pending-view-heading" class="section-heading">Cola de moderación: Títulos pendientes</h2>
+                        <h2 id="pending-view-heading" class="section-heading">Cola de moderación: Películas pendientes</h2>
                         <p class="section-subtitle">Revisa los datos enviados por los usuarios antes de aprobarlos o rechazarlos.</p>
                     </div>
                 </div>
 
-                <p id="pending-empty" class="status-message" hidden>No hay títulos pendientes de aprobación en este momento.</p>
+                <p id="pending-empty" class="status-message" hidden>No hay Películas pendientes de aprobación en este momento.</p>
                 <div id="pending-grid" class="pending-cards-grid"></div>
             </section>
 
