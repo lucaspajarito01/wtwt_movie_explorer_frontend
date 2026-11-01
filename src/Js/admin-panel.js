@@ -2,7 +2,7 @@ import { api, ApiError } from './api.js';
 import { getToken, clearSession } from './session.js';
 import { showFormError, setBusy, clearFormErrors } from './ui.js';
 
-const LOGIN_URL = new URL('../../Index.html', import.meta.url).href;
+const LOGIN_URL = new URL('../../index.html', import.meta.url).href;
 
 const messageEl = document.querySelector('#panel-message');
 const pendingList = document.querySelector('#pending-list');
